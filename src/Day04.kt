@@ -54,8 +54,13 @@ fun main() {
         return excluded
     }
 
-    fun part1(input: List<String>): Int {
+    fun generateAnswerList(input: List<String>): List<Int> {
         val answer = input[0].split(",").map { it.toInt() }
+        return answer
+    }
+
+    fun part1(input: List<String>): Int {
+        val answer = generateAnswerList(input)
 
         val bingoMaps = generateBingoMap(input)
 
@@ -81,14 +86,40 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
+        val answer = generateAnswerList(input)
+        val bingoSet = mutableSetOf<Int>()
+        val bingoMaps = generateBingoMap(input)
+
+        val resultIndexTable = mutableMapOf<Int, MutableSet<Int>>()
+        answer.forEachIndexed { _, it ->
+            for ((index, list) in bingoMaps) {
+                if (list.contains(it)) {
+                    val lastSet = resultIndexTable.getOrDefault(index, mutableSetOf())
+                    lastSet.add(list.indexOf(it))
+                    resultIndexTable[index] = lastSet
+                }
+
+                if (isBingo(resultIndexTable[index])) {
+                    bingoSet.add(index)
+                    if(bingoSet.size == bingoMaps.count()){
+                        val notHit = generateNonPickedValue(
+                            bingoMaps[index],
+                            resultIndexTable[index],
+                        )
+                        return notHit.sum() * it
+                    }
+                }
+            }
+        }
         return input.size
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day04_test")
     check(part1(testInput) == 4512)
+    check(part2(testInput) == 1924)
 
     val input = readInput("Day04")
     println(part1(input))
-//    println(part2(input))
+    println(part2(input))
 }
