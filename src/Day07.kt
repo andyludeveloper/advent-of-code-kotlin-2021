@@ -1,7 +1,16 @@
+import kotlin.math.*
+
 fun main() {
 
     fun part1(input: List<String>): Int {
-        TODO()
+        val crabPosition = input[0].split(",").map { it.toInt() }
+        val fuelMap = mutableMapOf<Int, Int>()
+        for (time in crabPosition.indices) {
+            fuelMap[time] = crabPosition.fold(0) { acc, i ->
+                acc + (abs(i - time))
+            }
+        }
+        return fuelMap.values.toList().minOf { it }
     }
 
     fun part2(input: List<String>): Long {
